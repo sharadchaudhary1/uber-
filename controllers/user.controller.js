@@ -32,7 +32,8 @@ module.exports.registerUser=async(req,res,next)=>{
     })
 
     const token=user.generateAuthToken();
-    res.status(201).json({token,user})
+    res.cookie('token',token,{ maxAge: 24 * 60 * 60 * 1000})
+    res.status(201).json({user})
 
 }
 

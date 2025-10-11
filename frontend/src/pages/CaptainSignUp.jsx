@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useState } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { CaptainDataContext } from '../context/CaptainContext';
+import axios from 'axios';
 
 const CaptainSignUp = () => {
 
@@ -8,17 +10,19 @@ const CaptainSignUp = () => {
               const[password,setPassword]=useState('');
                const[firstname,setFirstname]=useState('');
                 const[lastname,setLastname]=useState('');
-                const[captainData,setCaptainData]=useState({});
+               
                   const [color, setColor] = useState("");
                   const [vehicleNo, setVehicleNo] = useState("");
                    const [capacity, setCapacity] = useState(1);
                    const [vehicleType, setVehicleType] = useState("bike");
               
-                   console.log(captainData)
+                    const {captain,setCaptain}=useContext(CaptainDataContext)
+
+                    const navigate=useNavigate()
         
-                function handleSubmit(e){
+           async function handleSubmit(e){
                   e.preventDefault()
-                  setCaptainData({
+                 const captainData= {
                     fullname:{
                         firstname:firstname,
                         lastname:lastname
@@ -31,7 +35,17 @@ const CaptainSignUp = () => {
                              capacity,
                              vehicleType,
                     },
-                  })
+                  }
+
+                  const res=await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`,captainData,{withCredentials:true})
+
+                  if(res.status==201){
+                    const data=res.data
+                    setCaptain(data.captain)
+                   
+                    navigate('/start-home')
+                  }
+                  
                   setFirstname("");
                    setLastname("");
                    setEmail("");
@@ -40,7 +54,7 @@ const CaptainSignUp = () => {
                    setVehicleNo("");
                     setCapacity(1);
                      setVehicleType("car");
-        
+                  
                 }
     
 
@@ -60,8 +74,8 @@ const CaptainSignUp = () => {
             Login to Uber
           </h2>
 
-
-          <label className="block text-sm font-medium text-gray-600">First Name</label>
+{/* firstname */}
+          <label className="block text-l font-medium text-gray-600">First Name</label>
           <input
             value={firstname}
             onChange={(e) => setFirstname(e.target.value)}
@@ -71,8 +85,8 @@ const CaptainSignUp = () => {
             className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
           />
 
-      
-          <label className="block text-sm font-medium text-gray-600 mt-3">Last Name</label>
+      {/* lastname */}
+          <label className="block text-l font-medium text-gray-600 mt-3">Last Name</label>
           <input
             value={lastname}
             onChange={(e) => setLastname(e.target.value)}
@@ -82,8 +96,8 @@ const CaptainSignUp = () => {
             className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
           />
 
-  
-          <label className="block text-sm font-medium text-gray-600 mt-3">Email</label>
+      {/* email */}
+          <label className="block text-l font-medium text-gray-600 mt-3">Email</label>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -93,8 +107,8 @@ const CaptainSignUp = () => {
             className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
           />
 
-     
-          <label className="block text-sm font-medium text-gray-600 mt-3">Password</label>
+          {/* password */}
+          <label className="block text-l font-medium text-gray-600 mt-3">Password</label>
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -104,53 +118,84 @@ const CaptainSignUp = () => {
             className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
           />
         
-         <h3 className="text-lg mt-5 mb-2 font-semibold text-gray-700">Vehicle Details</h3>
+      
+<div className="mt-6      ">
+  <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+    Vehicle Information
+  </h3>
 
-            <label className="block text-sm font-medium text-gray-600">Vehicle Color</label>
-            <input
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              type="text"
-              required
-              placeholder="e.g. White, Black, Blue"
-              className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
-            />
+  <div className="flex flex-wrap gap-1 ">
+     
+     {/* vehicle color */}
+    <div className='w-[47%] '>
+      <label className="block text-l font-medium text-gray-600">
+        Vehicle Color
+      </label>
+      <input
+        value={color}
+        onChange={(e) => setColor(e.target.value)}
+        type="text"
+        required
+        placeholder="e.g. White, Black, Blue"
+        className="bg-gray-100 w-full px-4 py-2 mt-1 rounded-md focus:ring-2 focus:ring-gray-600 outline-none"
+      />
+    </div>
 
-            <label className="block text-sm font-medium text-gray-600 mt-3">Vehicle Number</label>
-            <input
-              value={vehicleNo}
-              onChange={(e) => setVehicleNo(e.target.value)}
-              type="text"
-              required
-              placeholder="Enter Vehicle Number (e.g. MH12AB1234)"
-              className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
-            />
+    {/* Vehicle Number */}
+    <div className='w-[47%] ml-3  '>
+      <label className="block text-l font-medium text-gray-600">
+        Vehicle Number
+      </label>
+      <input
+        value={vehicleNo}
+        onChange={(e) => setVehicleNo(e.target.value)}
+        type="text"
+        required
+        placeholder="e.g. MH12AB1234"
+        className="bg-gray-100 w-full px-4 py-2 mt-1 rounded-md focus:ring-2 focus:ring-gray-600 outline-none"
+      />
+    </div>
 
-            <label className="block text-sm font-medium text-gray-600 mt-3">Capacity</label>
-            <select
-              value={capacity}
-              onChange={(e) => setCapacity(Number(e.target.value))}
-              required
-              className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
-            >
-              {Array.from({ length: 8 }, (_, i) => i + 1).map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
+     {/* vehicle capacity */}
+    <div className='w-[47%]  py-3'>
+      <label className="block text-l font-medium text-gray-600">
+        Capacity
+      </label>
+      <select
+        value={capacity}
+        onChange={(e) => setCapacity(Number(e.target.value))}
+        required
+        className="bg-gray-100 w-full px-4 py-2 mt-1 rounded-md focus:ring-2 focus:ring-gray-600 outline-none"
+      >
+        <option value="">Select capacity</option>
+        {Array.from({ length: 6 }, (_, i) => i + 1).map((num) => (
+          <option key={num} value={num}>
+            {num} {num === 1 ? "seat" : "seats"}
+          </option>
+        ))}
+      </select>
+    </div>
 
-            <label className="block text-sm font-medium text-gray-600 mt-3">Vehicle Type</label>
-            <select
-              value={vehicleType}
-              onChange={(e) => setVehicleType(e.target.value)}
-              required
-              className="bg-[#eeeeee] w-full px-5 py-2 mt-2 rounded"
-            >
-              <option value="car">Car</option>
-              <option value="bike">Bike</option>
-              <option value="auto">Auto</option>
-            </select>
+    {/* vehicle type */}
+    <div className='w-[47%] ml-3 py-3'>
+      <label className="block text-l font-medium text-gray-600">
+        Vehicle Type
+      </label>
+      <select
+        value={vehicleType}
+        onChange={(e) => setVehicleType(e.target.value)}
+        required
+        className="bg-gray-100 w-full px-4 py-2 mt-1 rounded-md focus:ring-2 focus:ring-gray-600 outline-none"
+      >
+        <option value="">Select vehicle type</option>
+        <option value="car">Car</option>
+        <option value="bike">Bike</option>
+        <option value="auto">Auto</option>
+      </select>
+    </div>
+  </div>
+</div>
+
 
 
     
@@ -179,7 +224,7 @@ const CaptainSignUp = () => {
          <p className='text-[10px]' >Uber provides a technology platform that connects riders (users seeking transportation) with drivers (independent service providers).
 Uber does not own vehicles or employ drivers directly. Each driver operates as an independent contractor</p>
       </div>
-    </div>
+    </div>8
     </div>
   )
 }

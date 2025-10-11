@@ -1,7 +1,10 @@
 
+import axios from 'axios';
 import React from 'react'
+import { useContext } from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import  { UserDataContext } from '../context/UserContext';
 
 export const UserSignUp = () => {
 
@@ -9,22 +12,37 @@ export const UserSignUp = () => {
           const[password,setPassword]=useState('');
            const[firstname,setFirstname]=useState('');
             const[lastname,setLastname]=useState('');
-            const[userData,setUserData]=useState({});
-         
-            console.log(userData)
+            const[userData,setUserData]=useState();
+
+            const {user,setUser}=useContext(UserDataContext)
+           
+              const navigate=useNavigate()
     
-            function handleSubmit(e){
+           async function handleSubmit(e){
               e.preventDefault()
-              setUserData({
+            const newUser={
                 fullname:{
                     firstname:firstname,
                     lastname:lastname
                 },
                 email:email,
                 password:password
-              })
+              }
+
+              const res=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,newUser,  { withCredentials: true })
+
+              if(res.status==201){
+                const data=res.data
+                setUser(data.user)
+
+                navigate('/user-home')
+              }
+
+
               setEmail('')
               setPassword('')
+              setFirstname('')
+              setLastname('')
     
             }
 
@@ -40,7 +58,7 @@ export const UserSignUp = () => {
 
         <form onSubmit={handleSubmit} className="flex flex-col">
           <h2 className="text-2xl mb-3 text-center font-semibold text-gray-800">
-            Login to Uber
+            Register on Uber
           </h2>
 
 
@@ -92,7 +110,7 @@ export const UserSignUp = () => {
             type="submit"
             className="text-white bg-gray-700 font-semibold text-xl py-2 mt-4 rounded hover:bg-gray-800 transition"
           >
-            Login
+            create account
           </button>
         </form>
 
