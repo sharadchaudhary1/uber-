@@ -47,6 +47,11 @@ required:true,
     orderId:{
         type:String,
     },
+    otp:{
+     type:String,
+     select:false,
+     required:true
+    },
 
     signature:{
         type:String,

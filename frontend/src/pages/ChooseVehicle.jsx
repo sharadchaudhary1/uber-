@@ -6,56 +6,63 @@ import { IoLocationSharp } from "react-icons/io5";
 import { IoMdCash } from "react-icons/io";
 import { IoArrowBackCircle } from "react-icons/io5";
 import LookingForDriver from '../components/LookingForDriver';
+import { useEffect } from 'react';
+import { LuMoveRight } from 'react-icons/lu';
+import axios from 'axios';
+import { vehicleData } from '../constants/vehicles';
 
-const vehicleData = [
-  {
-    name: "Uber Go",
-    seats: 4,
-    img: "https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png",
-    eta: "3 min away",
-    price: "193.15",
-    description: "Affordable, comfort rides"
-  },
-   {
-    name: "Uber Go",
-    seats: 4,
-    img: "https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png",
-    eta: "3 min away",
-    price: "193.15",
-    description: "Affordable, comfort rides"
-  },
-
-  
-  {
-    name: "Uber Solo",
-    seats: 1,
-    img: "https://cn-geo1.uber.com/image-proc/crop/resizecrop/udam/format=auto/width=552/height=368/srcb64=aHR0cHM6Ly90Yi1zdGF0aWMudWJlci5jb20vcHJvZC91ZGFtLWFzc2V0cy8yYzdmYTE5NC1jOTU0LTQ5YjItOWM2ZC1hM2I4NjAxMzcwZjUucG5n",
-    eta: "2 min away",
-    price: "63.15",
-    description: "Affordable, comfort rides"
-  },
-  {
-    name: "Uber Go",
-    seats: 3,
-    img: "https://cn-geo1.uber.com/image-proc/crop/resizecrop/udam/format=auto/width=552/height=368/srcb64=aHR0cHM6Ly90Yi1zdGF0aWMudWJlci5jb20vcHJvZC91ZGFtLWFzc2V0cy8xZGRiOGM1Ni0wMjA0LTRjZTQtODFjZS01NmExMWEwN2ZlOTgucG5n",
-    eta: "5 min away",
-    price: "120.00",
-    description: "Affordable, comfort rides"
-  }
-];
-
-const pickupLocation = {
-  address: "562/11-A",
-  description: "Roorkee Canal, Roorkee"
-}
-const dropLocation = {
-  address: "MDR 39",
-  description: "Civil Lines, Roorkee"
-}
 
 const ChooseVehicle = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [confirmRide,setConfirmRide]=useState(false)
+
+     const [rideData, setRideData] = useState({ pickUp: "", destination: "" });
+     const [fare,setFare]=useState("")
+
+  useEffect(() => {
+    const saved = localStorage.getItem("rideData");
+    if (saved) {
+      setRideData(JSON.parse(saved));
+    }
+  }, []);
+
+
+  useEffect(() => {
+  async function fetchFare() {
+    if (!rideData.pickUp || !rideData.destination) return;
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/rides/get-fare?pickup=${encodeURIComponent(rideData.pickUp)}&destination=${encodeURIComponent(rideData.destination)}`,
+        {withCredentials:true}
+      );
+      setFare(res.data);
+    } catch (err) {
+      console.error("Error fetching fare:", err.message);
+    }
+  }
+
+  fetchFare();
+}, [rideData]);
+
+
+async function createRide(vehicle) {
+
+  try {
+    const createRideData = {
+      pickup: rideData.pickUp,
+      destination: rideData.destination,
+      vehicleType: vehicle
+    };
+    const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, createRideData, { withCredentials: true });
+    const ride = res.data;
+    console.log("Ride created:", ride);
+  } catch (err) {
+    console.error("Error creating ride:", err.message);
+    
+  } 
+}
+
+
   return (
 
  
@@ -63,7 +70,7 @@ const ChooseVehicle = () => {
       {/* Map */}
       <img
         className="fixed top-0 left-0 w-full h-[50%] object-cover z-0"
-        src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+        src="https://i.sstatic.net/gtiI7.gif"
         alt="map"
       />
 
@@ -79,9 +86,13 @@ const ChooseVehicle = () => {
         {/* Choose Vehicle Section */}
         {!selectedVehicle && (
           <div className="relative pointer-events-auto w-full md:w-[500px] mx-auto bg-gray-100 shadow-2xl rounded-t-2xl p-6 transition-all duration-500 h-[62%] border-none animate-fadeInUp">
-            <h2 className="text-2xl font-bold mb-2 text-center">Choose a vehicle</h2>
+            <h2 className="text-2xl font-bold mb-2 text-center">Choose a vehicle from</h2>
+            <p className='flex align-center line-clamp-2 justify-center gap-3'> {rideData.pickUp} <span className='mt-1'> <LuMoveRight /></span> <span clas>{rideData.destination}</span>  </p>
             <div className="flex flex-col gap-5 mt-4">
-              {vehicleData.map((vehicle, idx) => (
+              {vehicleData.map((vehicle, idx) => {
+                 const lowerName = vehicle.name.toLowerCase(); 
+                   const vehiclePrice = fare?.[lowerName] || "—";
+                return (
                 <button
                   key={idx}
                   className="flex items-center gap-4 bg-white border border-gray-200 hover:border-gray-400 shadow hover:shadow-lg rounded-xl p-3 transition-all duration-200 hover:bg-gray-50 hover:scale-[1.02] active:ring-2 active:ring-black"
@@ -93,16 +104,17 @@ const ChooseVehicle = () => {
                   <div className="flex flex-col flex-1">
                     <h2 className="flex gap-2 font-semibold items-center text-lg">{vehicle.name} <span><FaUser /></span> {vehicle.seats}</h2>
                     <div className="flex justify-between items-center mt-1">
-                      <span className="text-gray-600 text-sm">{vehicle.eta}</span>
+                      <span className="text-gray-600 text-sm">{fare.duration} min away </span>
                       <span className="flex items-center gap-1 text-green-700 font-bold text-lg">
                         <FaIndianRupeeSign />
-                        {vehicle.price}
+                        
+                           {vehiclePrice}
                       </span>
                     </div>
                     <span className="text-xs text-gray-500 mt-1">{vehicle.description}</span>
                   </div>
                 </button>
-              ))}
+               )})}
             </div>
           </div>
         )}
@@ -129,26 +141,31 @@ const ChooseVehicle = () => {
                 <div className="flex gap-2 items-center mb-3 text-left">
                   <IoLocationSharp className="text-xl text-blue-600" />
                   <span>
-                    <h1 className="font-bold text-base">{pickupLocation.address}</h1>
-                    <h3 className="text-xs text-gray-500">{pickupLocation.description}</h3>
+                    <h1 className="font-bold text-base">{rideData.pickUp}</h1>
+                    {/* <h3 className="text-xs text-gray-500">{pickupLocation.description}</h3> */}
                   </span>
                 </div>
                 <div className="flex gap-2 items-center mb-3 text-left">
                   <IoLocationSharp className="text-xl text-red-500" />
                   <span>
-                    <h1 className="font-bold text-base">{dropLocation.address}</h1>
-                    <h3 className="text-xs text-gray-500">{dropLocation.description}</h3>
+                    <h1 className="font-bold text-base">{rideData.destination}</h1>
+                    {/* <h3 className="text-xs text-gray-500">{dropLocation.description}</h3> */}
                   </span>
                 </div>
                 <div className="flex gap-2 items-center mb-3">
                   <IoMdCash className="text-xl text-green-600" />
                   <span className="flex gap-2 items-center text-lg font-bold">
-                    <FaIndianRupeeSign />{selectedVehicle.price}
+                    <FaIndianRupeeSign />
+                    {
+                    fare?.[selectedVehicle.name.toLowerCase()]
+                    }
                   </span>
                   <span className="text-gray-700 ml-2">Cash</span>
                 </div>
               </div>
-              <button onClick={()=>setConfirmRide(true)} className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white rounded-xl py-3 text-xl font-bold shadow hover:from-green-600 hover:to-green-800 transition-all duration-200 mt-2">
+              <button onClick={()=>{
+               createRide(selectedVehicle.name.toLowerCase())
+               setConfirmRide(true)}} className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white rounded-xl py-3 text-xl font-bold shadow hover:from-green-600 hover:to-green-800 transition-all duration-200 mt-2">
                 Confirm
               </button>
             
@@ -159,8 +176,10 @@ const ChooseVehicle = () => {
           { 
         confirmRide && (
             <LookingForDriver selectedVehicle={selectedVehicle}
-             pickupLocation={pickupLocation}
-             dropLocation={dropLocation}/>
+             pickupLocation={rideData.pickUp}
+             dropLocation={rideData.destination}
+             fare={fare?.[selectedVehicle.name.toLowerCase()]}
+             />
         )
      }
       </div>
@@ -170,7 +189,7 @@ const ChooseVehicle = () => {
 
 }
 
-export default ChooseVehicle
+export default ChooseVehicle;
 
 
 

@@ -10,13 +10,13 @@ const CaptainRiding = () => {
  <div className="relative overflow-x-hidden border-none h-screen w-screen bg-white font-sans">
       <img
         className="fixed top-0 left-0 w-full h-4/5 object-cover z-0"
-        src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+        src="https://i.sstatic.net/gtiI7.gif"
         alt="map"
       />
 
       <img
         className="absolute h-20 w-25 ml-5 mt-8 z-20"
-        src="https://download.logo.wine/logo/Uber/Uber-Logo.wine.png"
+        src="https://w7.pngwing.com/pngs/636/735/png-transparent-logo-uber-brand-design-text-logo-engineering-thumbnail.png"
         alt="logo"
       />
 

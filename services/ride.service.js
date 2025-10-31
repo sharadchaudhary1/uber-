@@ -2,6 +2,7 @@
 
 const rideModel=require('../models/ride.model')
 const mapservice=require('./maps.service')
+const crypto =require('crypto')
 
 
 function calculateFare(distance, vehicleType) {
@@ -26,17 +27,27 @@ async function getFare(pickup, destination) {
     const duration = distanceTime.duration; 
 
     return {
-        auto: calculateFare(distance, 'auto'),
-        bike: calculateFare(distance, 'bike'),
-        car: calculateFare(distance, 'car'),
+        auto: Math.round(calculateFare(distance, 'auto')),
+        bike: Math.round(calculateFare(distance, 'bike')),
+        car: Math.round(calculateFare(distance, 'car')),
         distance,
         duration
     };
 }
 
+module.exports.getFare=getFare;
+
+function getOtp(num){
+   function generateOtp(num){
+    const otp=crypto.randomInt(Math.pow(10,num-1),Math.pow(10,num)).toString()
+    return otp;
+   }
+   return generateOtp(num)
+}
+
 module.exports.createRide=async({user,pickup,destination,vehicleType})=>{
 
-    if(!user ||!vehicleType||pickup||destination){
+    if(!user ||!vehicleType||!pickup||!destination){
         throw new Error('all fields are required')
     }
 
@@ -48,6 +59,9 @@ module.exports.createRide=async({user,pickup,destination,vehicleType})=>{
         pickup,
         destination,
         fare,
+        otp:getOtp(6),
+        duration: fareDetails.duration,
+        distance:fareDetails.distance
 
     })
 

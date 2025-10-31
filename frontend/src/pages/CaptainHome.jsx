@@ -8,21 +8,39 @@ import { FaIndianRupeeSign, FaRupeeSign } from 'react-icons/fa6';
 import { IoMdTime } from 'react-icons/io';
 import { RiLogoutBoxLine, RiSpeedUpLine } from "react-icons/ri";
 import { LuNotebook } from "react-icons/lu";
+import axios from 'axios';
+import { CaptainDataContext } from '../context/CaptainContext';
+import { useEffect } from 'react';
+import { useContext } from 'react';
 
 const CaptainHome = () => {
+
+  const {captain,setCaptain}=useContext(CaptainDataContext)
+ 
+  useEffect(()=>{
+
+    async function currentCaptain(){
+      const res=await axios.get(`${import.meta.env.VITE_BASE_URL}/captains/profile`,{withCredentials:true})
+      setCaptain(res.data.captain)
+   
+    }
+    currentCaptain()
+  },[])
+  console.log(captain)
+
   return (
     <div className="relative overflow-x-hidden border-none h-screen w-screen bg-white font-sans">
    
       <img
         className="fixed top-0 left-0 w-full h-3/5 object-cover z-0"
-        src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+        src="https://i.sstatic.net/gtiI7.gif"
         alt="map"
       />
 
    
       <img
         className="absolute h-18 w-20 ml-5 mt-8 z-20"
-        src="https://download.logo.wine/logo/Uber/Uber-Logo.wine.png"
+        src="https://w7.pngwing.com/pngs/636/735/png-transparent-logo-uber-brand-design-text-logo-engineering-thumbnail.png"
         alt="logo"
       />
       
@@ -36,7 +54,7 @@ const CaptainHome = () => {
       <div className='flex items-center px-8 mt-8 justify-between'>
         <div className='flex gap-2 items-center'>
             <img className='h-12 w-12 rounded-full' src='https://politics.princeton.edu/sites/default/files/styles/square/public/images/p-5.jpeg?h=87dbaab7&itok=ub6jAL5Q' ></img>
-            <h1 className='text-xl font-semibold'>Harsh Patel</h1>
+            <h1 className='text-xl capitalize font-semibold'>{captain.fullname.firstname + " "+ captain.fullname.lastname} </h1>
         </div>
         <div className='flex flex-col'> 
              <h1 className='flex items-center text-xl font-medium '><FaIndianRupeeSign /> 295 </h1>

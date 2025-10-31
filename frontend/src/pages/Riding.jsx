@@ -9,7 +9,7 @@ const Riding = () => {
       <div className="h-1/2">
         <img
           className="h-full object-cover"
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+          src="https://i.sstatic.net/gtiI7.gif"
           alt="map"
         />
       </div>

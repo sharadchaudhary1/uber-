@@ -27,7 +27,7 @@ const CaptainLogin = () => {
               if(res.status==200){
                 const data=res.data
                 setCaptain(data.captain)
-                navigate('/start-home')
+                navigate('/captain-home')
               }
               setEmail('')
               setPassword('')

@@ -8,5 +8,5 @@ const router=express.Router()
 
 router.post('/create',authMiddleware.authUser,rideController.createRide)
 
-
+router.get('/get-fare',authMiddleware.authUser,rideController.getFare)
 module.exports=router;

@@ -14,4 +14,3 @@ router.get('/get-distance-time',authMiddleware.authUser,mapController.getDistanc
 router.get('/get-suggestion',authMiddleware.authUser,mapController.getAutoSuggestion)
 
 module.exports=router;
-authMiddleware.auth

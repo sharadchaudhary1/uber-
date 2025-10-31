@@ -1,112 +1,38 @@
 
-
-// import React, { useState } from 'react'
-// import { IoIosArrowDown } from "react-icons/io";
-
-// export const UserHome = () => {
-    
-//   const[pickUp,setPickUp]=useState('')
-//   const [destination,setDestination]=useState('')
-
-//   const [pickUpPanel,setPickUpPanel]=useState(false)
-
-
-//   function handleSubmit(e){
-//     e.preventDefault()
-//   }
-
-//   return (
-//     <div className='h-screen  relative' >
-
-//         <img
-//           className="h-18 w-20 ml-5 mt-8 absolute "
-//           src="https://download.logo.wine/logo/Uber/Uber-Logo.wine.png"
-//         />
-
-//       <div className="h-screen w-screen">
-//   <img
-//     className=" w-full h-full object-cover "
-//     src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-//   />
-// </div>
-
-// <div className="flex flex-col  w-full  top-0 h-screen   ">
-
-// <div className='h-[30%] bg-white relative p-6' >
-
-//   <div className='absolute right-7 text-2xl ' >
-//     <IoIosArrowDown />
-//     </div>
-//   <h2 className="text-2xl font-semibold  mb-5">Find a Ride</h2>
-    
-//   <form onSubmit={(e)=>handleSubmit(e)} className="flex relative flex-col  gap-7">
-//     <div className='line bottom-6 left-4 bg-gray-600 h-20 w-1 absolute'></div>
-
-//     <input
-//         onClick={()=>setPickUpPanel(true)}
-
-//     value={pickUp}
-//     onChange={(e)=>setPickUp(e.target.value)}
-//       type="text"
-//       placeholder="Enter pick-up location"
-//       className="bg-[#eee] border rounded-lg text-lg px-10 py-3"
-//     />
-     
-   
-//     <input
-//          onClick={()=>setPickUpPanel(true)}
-//       value={destination}
-//       onChange={(e)=>setDestination(e.target.value)}
-//       type="text"
-//       placeholder="Enter destination location"
-//       className="bg-[#eee] text-lg border rounded-lg px-10 py-3"
-//     />
-//   </form>
-// </div>
-
-//   <div className='bg-red-400 h-0' >  </div>
-// </div>
-
-
-//     </div>
-//   )
-// }
-
-
-
-
-
-
-
 import React, { useState, useRef, useEffect } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import gsap from "gsap";
 import LocationSearchPanel from "../components/LocationSearchPanel";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const UserHome = () => {
   const [pickUpPanel, setPickUpPanel] = useState(false);
   const [pickUp, setPickUp] = useState("");
   const [destination, setDestination] = useState("");
+  const [suggestions,setSuggestions]=useState([])
+    const [activeField, setActiveField] = useState(null); 
 
   const panelRef = useRef(null);
   const extraDivRef = useRef(null);
   const mapRef = useRef(null);
   const arrowRef = useRef(null);
+   const navigate = useNavigate(); 
 
   useEffect(() => {
     if (pickUpPanel) {
-      // Move form panel to top, 30% height
+   
       gsap.to(panelRef.current, { top: 0, bottom: "auto", height: "30%", duration: 0.5 });
-      // Extra div below form, height 70%
+
       gsap.to(extraDivRef.current, { top: "30%", height: "70%", duration: 0.5 });
-      // Map behind panel hidden
+   
       gsap.to(mapRef.current, { opacity: 0, duration: 0.5 });
-      // Arrow visible
+
       gsap.to(arrowRef.current, { opacity: 1, duration: 0.5 });
     } else {
-      // Form panel back to bottom
+ 
       gsap.to(panelRef.current, { bottom: 0, top: "auto", height: "30%", duration: 0.1 });
-      // Extra div shrinks to 0
+ 
       gsap.to(extraDivRef.current, { height: 0, top: "auto", duration: 0.1 });
       // Map visible
       gsap.to(mapRef.current, { opacity: 1, duration: 0.5 });
@@ -115,13 +41,60 @@ export const UserHome = () => {
     }
   }, [pickUpPanel]);
 
+
+ async function getSuggestion(input){
+    
+  if(!input) return 
+   try {
+    const res = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/maps/get-suggestion?input=${encodeURIComponent(input)}`,
+      { withCredentials: true }
+    );
+   
+
+  setSuggestions(res.data)
+
+  }
+  catch(err){
+    console.error("Error fetching suggestions:", err.message);
+  }
+}
+
+
+function handleSelect(location) {
+    if (activeField === "pickup") {
+      setPickUp(location.name);
+    } else if (activeField === "destination") {
+      setDestination(location.name);
+    }
+ 
+ 
+  }
+
+
+
+  function handleSubmit(e) {
+  e.preventDefault();
+
+  if (!pickUp || !destination) {
+    alert("Please select both pickup and destination.");
+    return;
+  }
+
+ 
+  localStorage.setItem("rideData", JSON.stringify({ pickUp, destination }));
+
+  navigate("/vehicle");
+}
+
+
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="relative h-screen w-screen ">
       {/* Map */}
       <img
         ref={mapRef}
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
-        src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+        src="https://i.sstatic.net/gtiI7.gif"
         alt="map"
       />
 
@@ -147,23 +120,40 @@ export const UserHome = () => {
           <IoIosArrowDown />
         </div>
         <h2 className="text-2xl font-semibold mb-5">Find a Ride</h2>
-        <form className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
+            name="pickup"
             placeholder="Enter pick-up location"
             className="bg-[#eee] border rounded-lg px-4 py-3 text-lg"
             value={pickUp}
-            onChange={(e) => setPickUp(e.target.value)}
-            onClick={() => setPickUpPanel(true)}
+            onChange={(e) => {
+              setPickUp(e.target.value)
+              getSuggestion(e.target.value);
+
+            }}
+            onClick={() => {
+              setActiveField("pickup");
+              setPickUpPanel(true);
+            }}
           />
           <input
             type="text"
+            name="destination"
             placeholder="Enter destination location"
             className="bg-[#eee] border rounded-lg px-4 py-3 text-lg"
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            onClick={() => setPickUpPanel(true)}
+             onChange={(e) => {
+             setDestination(e.target.value);
+              getSuggestion(e.target.value);
+             }}
+             onClick={() => {
+              setActiveField("destination");
+              setPickUpPanel(true);
+            }}
+           
           />
+          <button type="submit" className="bg-black text-white  px-4 py-2 rounded-xl" >Find Trip</button>
         </form>
       </div>
 
@@ -173,7 +163,7 @@ export const UserHome = () => {
         className="absolute left-0 w-full bottom-0 h-0 bg-white z-10"
         
       >
-        {pickUpPanel && <LocationSearchPanel/>}
+        {pickUpPanel && <LocationSearchPanel suggestions={suggestions} onSelect={handleSelect} />}
        
         </div>
     </div>

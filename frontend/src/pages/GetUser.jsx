@@ -14,7 +14,7 @@ const GetUser = () => {
      
        console.log(res?.data);
      
-      setProfile(res.data); // ✅ save response data
+      setProfile(res.data); 
      
     } catch (error) {
       console.error("Error fetching profile:", error);

@@ -7,13 +7,13 @@ import { FaIndianRupeeSign } from 'react-icons/fa6'
 import { IoMdCash } from 'react-icons/io'
 import { IoLocationSharp } from 'react-icons/io5'
 
-const LookingForDriver = ({selectedVehicle,pickupLocation,dropLocation}) => {
+const LookingForDriver = ({selectedVehicle,pickupLocation,dropLocation,fare}) => {
   return (
 
    
          <div className="relative pointer-events-auto w-full md:w-[500px] mx-auto bg-white shadow-2xl rounded-t-2xl p-6 transition-all duration-500 border-none animate-fadeInUp">
              <div className="flex items-center justify-between">
-               <h2 className="text-2xl font-bold text-center w-full">Confirm your ride</h2>
+               <h2 className="text-2xl font-bold text-center w-full">Looking for a Driver</h2>
        
              
               </div>
@@ -25,21 +25,21 @@ const LookingForDriver = ({selectedVehicle,pickupLocation,dropLocation}) => {
                  <div className="flex gap-2 items-center mb-3 text-left">
                    <IoLocationSharp className="text-xl text-blue-600" />
                    <span>
-                     <h1 className="font-bold text-base">{pickupLocation.address}</h1>
-                     <h3 className="text-xs text-gray-500">{pickupLocation.description}</h3>
+                     <h1 className="font-bold text-base">{pickupLocation}</h1>
+
                    </span>
                  </div>
                  <div className="flex gap-2 items-center mb-3 text-left">
                    <IoLocationSharp className="text-xl text-red-500" />
                    <span>
-                     <h1 className="font-bold text-base">{dropLocation.address}</h1>
-                     <h3 className="text-xs text-gray-500">{dropLocation.description}</h3>
+                     <h1 className="font-bold text-base">{dropLocation}</h1>
+
                    </span>
                  </div>
                  <div className="flex gap-2 items-center mb-3">
                    <IoMdCash className="text-xl text-green-600" />
                    <span className="flex gap-2 items-center text-lg font-bold">
-                     <FaIndianRupeeSign />{selectedVehicle.price}
+                     <FaIndianRupeeSign />{fare}
                    </span>
                    <span className="text-gray-700 ml-2">Cash</span>
                  </div>
@@ -48,8 +48,7 @@ const LookingForDriver = ({selectedVehicle,pickupLocation,dropLocation}) => {
              
              </div>
            </div>
-  
-     
+
   )
 }
 

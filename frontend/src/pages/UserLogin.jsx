@@ -33,8 +33,8 @@ const UserLogin = () => {
             setUser(data.user)
          
 
-const token = Cookies.get('token');
-console.log(token);
+
+
 
             navigate('/user-home')
           }

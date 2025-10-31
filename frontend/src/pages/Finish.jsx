@@ -57,7 +57,7 @@ const Finish = () => {
       {/* Background Map */}
       <img
         className="fixed top-0 left-0 w-full h-[35vh] object-cover z-0 opacity-90"
-        src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
+        src="https://i.sstatic.net/gtiI7.gif"
         alt="map"
       />
 
